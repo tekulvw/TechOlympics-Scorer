@@ -27,12 +27,12 @@ class Check(object):
             return web.seeother("/")
         event_list = web.ctx.c.execute("SELECT id, name from Events").fetchall()
         #print event_list
-        user_data = web.ctx.c.execute("SELECT id, name, school_code FROM Student WHERE (id == :uuid)", {'uuid':int(form.uuid)}).fetchone()
+        user_data = web.ctx.c.execute("SELECT id, name, score, school_code FROM Student WHERE (id == :uuid)", {'uuid':int(form.uuid)}).fetchone()
         #print user_data
-        school_code = int(user_data[2])
+        school_code = int(user_data[3])
         school_name = web.ctx.c.execute("SELECT name FROM School WHERE (id == :school_code)", {'school_code':school_code}).fetchone()[0]
         #print school_name
-        return render.check(id=form.uuid, name=user_data[1], school_name=school_name, event_list=event_list)
+        return render.check(id=form.uuid, name=user_data[1], score=user_data[2], school_name=school_name, event_list=event_list)
 
 class Submit(object):
     def GET(self):
@@ -40,6 +40,11 @@ class Submit(object):
 
     def POST(self):
         # TODO Save data into db and update scores
+        form = web.input(uuid=None, event_id=None)
+        print form.event_id
+        point_value = int(web.ctx.c.execute("SELECT value FROM Events WHERE (id == :event_id)", {'event_id':int(form.event_id)}).fetchone()[0])
+        web.ctx.c.execute("UPDATE Student SET score = score + :point_value WHERE (id == :uuid)", {'uuid':int(form.uuid), 'point_value':point_value})
+        web.ctx.conn.commit()
         return render.saved()
 
 def my_loadhook():

@@ -1,13 +1,14 @@
-$def with (id, name, school_name, event_list)
+$def with (id, name, score, school_name, event_list)
 
 <form action="/submit" method=POST>
     <p>ID: $id</p>
     <p>NAME: $name</p>
+    <p>SCORE: $score</p>
     <p>SCHOOL: $school_name</p>
 
     <p>Events:</p>
     $for event in event_list:
-        <input type="radio" name="event" value="$event[1]">$event[1]<br>
+        <input type="radio" name="event_id" value="$event[0]">$event[1]<br>
 
     <p>Manual Point Entry<p>
 
